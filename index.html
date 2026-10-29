@@ -97,6 +97,22 @@ footer #save{flex:1.6;background:var(--blue);color:#fff;box-shadow:0 3px 0 #0b3d
 .g .slot .no{font-size:36px;font-weight:900}
 .slot .pos{font-size:12px;font-weight:900;color:#cfe0ff;top:2px;left:7px}
 .nmn{font-size:13px;font-weight:900;color:#ffe27a;top:2px;right:7px;max-width:68%}
+.row.g .slot{flex:1.3}.row.g .slot small{font-size:10px}
+.row.g .btn.tor{flex:.8;background:var(--blue);border-color:#fff;box-shadow:0 3px 0 #082c5e}
+.tor .tt{font-size:28px;font-weight:900;letter-spacing:1px;color:#fff;line-height:1}
+#gm{display:none;position:fixed;inset:0;background:#0009;z-index:9;align-items:flex-end}#gm.on{display:flex}
+#gm .sheet{background:var(--card);border-radius:18px 18px 0 0;width:100%;padding:12px 10px calc(12px + env(safe-area-inset-bottom,0px));height:84vh;display:flex;flex-direction:column;gap:8px}
+#gm h2{margin:0;font-size:19px;color:var(--navy);display:flex;justify-content:space-between;align-items:center}
+@media (prefers-color-scheme:dark){#gm h2{color:#8fbcff}}
+#gm h2 button{border:0;background:var(--grey);color:var(--ink);border-radius:10px;padding:8px 14px;font-weight:800;font-size:14px}
+#gt{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.gtab{border:2px solid var(--navy);background:var(--card);color:var(--ink);border-radius:10px;padding:6px 2px;display:flex;flex-direction:column;align-items:center;font-weight:800}
+.gtab span{font-size:11px;color:var(--mut)}.gtab b{font-size:17px}
+.gtab.on{background:var(--navy);color:#fff}.gtab.on span{color:#cfe0ff}
+#gl{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;overflow-y:auto;flex:1;align-content:start;-webkit-overflow-scrolling:touch}
+#gl .pn.clr{grid-column:span 4}
+.pn:disabled{opacity:.25;text-decoration:line-through}
+#gsave{border:0;border-radius:12px;padding:15px;font-size:18px;font-weight:900;background:var(--green);color:#fff}#gsave:disabled{background:var(--grey);color:var(--mut)}
 </style>
 </head>
 <body>
@@ -114,6 +130,7 @@ footer #save{flex:1.6;background:var(--blue);color:#fff;box-shadow:0 3px 0 #0b3d
 <div id="toast"></div>
 <div id="pick"><div class="sheet"><h2><span id="pt"></span><button id="pdone">Fertig</button></h2><div id="pg"></div></div></div>
 <div id="tm"><div class="box"><h2>Teamliste</h2><p id="tcount"></p><div class="r"><input id="tn" inputmode="decimal" placeholder="Nummern, z. B. 7, 12, 19"><button id="tadd">+</button></div><div id="tc"></div><p style="margin-bottom:10px">Nummer antippen = entfernen</p><button id="tdone">Fertig</button></div></div>
+<div id="gm"><div class="sheet"><h2><span>Tor erfassen</span><button id="gx">Abbrechen</button></h2><div id="gt"></div><div id="gl"></div><button id="gsave">Tor speichern</button></div></div>
 <div id="modal"><div class="box">
   <h2>Sheet speichern</h2>
   <input id="title" placeholder="Überschrift, z. B. U17 gegen Selb, 29.10." maxlength="80">
@@ -156,7 +173,7 @@ function mk(i){const no=S.slots[i],g=i==15,b=document.createElement('div');
 function render(){
   $('#edit').classList.toggle('on',S.edit);$('#edit').textContent=S.edit?'EDIT':'GAME';$('#tbtn').style.display=S.edit?'':'none';
   $('#sub').textContent=S.edit?'Edit-Modus · Positionen antippen':'Game-Modus · Live-Tagging';
-  $('#per').textContent=S.per+'. Drittel';
+  $('#per').textContent=S.per==4?'OT':S.per+'. Drittel';
   $('#logo').innerHTML=S.logo?'<img src="'+S.logo+'" alt="">':'EVW';
   $('#leg').textContent=S.edit?'Position antippen, Nummer wählen':'Spieler: ● Schuss ▶ Block ▲ + ▼ −  |  TW: ● Save ▼ Gegentor';
   
@@ -170,7 +187,8 @@ function render(){
     bl.appendChild(b)});
   const gr=$('#grid');gr.innerHTML='';
   for(let r=0;r<3;r++){const blk=document.createElement('div');blk.className='reihe r'+(r+1);blk.innerHTML='<div class="rl"><span>REIHE '+(r+1)+'</span></div>';const body=document.createElement('div');body.className='rb';const fw=document.createElement('div');fw.className='fw';[2,1,0].forEach(k=>fw.appendChild(mk(r*5+k)));const df=document.createElement('div');df.className='df';[3,4].forEach(k=>df.appendChild(mk(r*5+k)));body.append(fw,df);blk.appendChild(body);gr.appendChild(blk)}
-  const g=document.createElement('div');g.className='row g';g.innerHTML='<div class="rl">G</div>';g.appendChild(mk(15));gr.appendChild(g);
+  const g=document.createElement('div');g.className='row g';g.innerHTML='<div class="rl">G</div>';g.appendChild(mk(15));
+  const tb=document.createElement('div');tb.className='btn tor'+(S.edit?' dim':'');tb.innerHTML='<span class="tt">TOR</span><small>Tore: '+cnt(e=>e.k=='goal'&&e.d)+'</small>';tb.onclick=openGoal;g.appendChild(tb);gr.appendChild(g);
 }
 function openPick(i){pk=i;const used=new Set(S.slots.filter((x,j)=>x&&j!=i));
   let h='<button class="pn clr" data-v="">leer</button>';
@@ -183,7 +201,7 @@ $('#pdone').onclick=()=>$('#pick').classList.remove('on');
 $('#pick').addEventListener('click',e=>{if(e.target.id=='pick')$('#pick').classList.remove('on')});
 
 $('#edit').onclick=()=>{S.edit=!S.edit;persist();render()};
-$('#per').onclick=()=>{S.per=S.per%3+1;persist();render()};
+$('#per').onclick=()=>{S.per=S.per%4+1;persist();render()};
 $('#undo').onclick=()=>{if(S.ev.length){S.ev.pop();persist();toast('Letztes Ereignis entfernt');render()}};
 $('#logo').onclick=()=>$('#file').click();
 $('#file').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,160/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);S.logo=c.toDataURL('image/png');persist();render()};im.src=r.result};r.readAsDataURL(f)};
@@ -193,18 +211,44 @@ $('#tbtn').onclick=()=>{teamRender();$('#tm').classList.add('on')};
 $('#tadd').onclick=teamAdd;$('#tn').onkeydown=e=>{if(e.key=='Enter')teamAdd()};
 $('#tc').onclick=e=>{const n=e.target.dataset.n;if(!n)return;S.team=S.team.filter(x=>x!=n);S.slots=S.slots.map(x=>x==n?null:x);persist();teamRender();render()};
 $('#tdone').onclick=()=>{teamAdd();$('#tm').classList.remove('on')};
+// Tor-Dialog
+const KEYS=['s','a1','a2','m'],TL=['Torschütze','Assist 1','Assist 2','Minute'],PR={1:[1,20],2:[21,40],3:[41,60],4:[61,65]};
+const PN=p=>p==4?'OT':p;
+let G={tab:0,s:null,a1:null,a2:null,m:null};
+function allNums(){const sk=[...new Set([...Object.keys(SK),...S.team.filter(x=>!GK[x])])].sort((a,b)=>a-b);return [...sk,...Object.keys(GK)]}
+function renderGoal(){
+  $('#gt').innerHTML=KEYS.map((k,i)=>{const v=G[k];return '<button class="gtab'+(G.tab==i?' on':'')+'" data-t="'+i+'"><span>'+TL[i]+'</span><b>'+(v?(k=='m'?v+"'":'#'+v):'–')+'</b></button>'}).join('');
+  let h='';
+  if(G.tab<3){const k=KEYS[G.tab],others=KEYS.slice(0,3).filter(x=>x!=k).map(x=>G[x]).filter(Boolean);
+    h+='<button class="pn clr" data-v="">'+(G.tab==0?'Auswahl löschen':'kein Assist')+'</button>';
+    allNums().forEach(n=>{h+='<button class="pn'+(G[k]==n?' cur':'')+'"'+(others.includes(n)?' disabled':'')+' data-v="'+n+'">'+n+(NM(n)?'<small>'+NM(n)+'</small>':'')+'</button>'})}
+  else{const r=PR[S.per]||PR[1];for(let m=r[0];m<=r[1];m++)h+='<button class="pn'+(G.m==m?' cur':'')+'" data-v="'+m+'">'+m+"'</button>"}
+  $('#gl').innerHTML=h;
+  $('#gsave').disabled=!G.s;$('#gsave').textContent=G.s?'Tor speichern':'Zuerst Torschütze wählen';
+}
+$('#gt').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;G.tab=+b.dataset.t;renderGoal()};
+$('#gl').onclick=e=>{const b=e.target.closest('[data-v]');if(!b||b.disabled)return;const v=b.dataset.v;
+  if(G.tab<3){const k=KEYS[G.tab];
+    if(v===''){G[k]=null;if(G.tab>0){if(G.tab==1)G.a2=null;G.tab=3}}
+    else{G[k]=(G[k]==v)?null:v;if(G[k])G.tab++}}
+  else G.m=(G.m==v)?null:v;
+  renderGoal()};
+function openGoal(){G={tab:0,s:null,a1:null,a2:null,m:null};renderGoal();$('#gm').classList.add('on')}
+$('#gx').onclick=()=>$('#gm').classList.remove('on');
+$('#gsave').onclick=()=>{if(!G.s)return;S.ev.push({t:new Date().toLocaleTimeString('de-DE'),p:S.per,k:'goal',d:G.s,a1:G.a1||'',a2:G.a2||'',m:G.m||'',n:''});persist();toast('TOR! #'+G.s);$('#gm').classList.remove('on');render()};
 // Export
 const uniq=a=>[...new Set(a.filter(Boolean).map(String))].sort((a,b)=>a-b);
 function stats(){
-  const nums=uniq([...S.slots.slice(0,15),...S.ev.filter(e=>['pshot','blk','plus','minus'].includes(e.k)).map(e=>e.d)]);
+  const nums=uniq([...S.slots.slice(0,15),...S.ev.filter(e=>['pshot','blk','plus','minus'].includes(e.k)).map(e=>e.d),...S.ev.filter(e=>e.k=='goal').flatMap(e=>[e.d,e.a1,e.a2])]);
   const gs=uniq([S.slots[15],...S.ev.filter(e=>e.k=='save'||e.k=='ga').map(e=>e.d)]);
   return{
     by:[1,2,3].map(c=>[c+(S.slots[(c-1)*5+1]?' (#'+S.slots[(c-1)*5+1]+')':''),cnt(e=>e.k=='bw'&&e.d==c),cnt(e=>e.k=='bl'&&e.d==c),cnt(e=>e.k=='bd'&&e.d==c)]),
-    pl:nums.map(n=>{const b=cnt(e=>e.k=='blk'&&e.d==n),p=cnt(e=>e.k=='plus'&&e.d==n),m=cnt(e=>e.k=='minus'&&e.d==n);return['#'+n+nm(n),cnt(e=>e.k=='pshot'&&e.d==n),b,p,m,(p-m>0?'+':'')+(p-m)]}),
+    goals:S.ev.filter(e=>e.k=='goal'&&e.d).map(e=>[PN(e.p),e.m?e.m+"'":'–','#'+e.d+nm(e.d),e.a1?'#'+e.a1+nm(e.a1):'–',e.a2?'#'+e.a2+nm(e.a2):'–']),
+    pl:nums.map(n=>{const b=cnt(e=>e.k=='blk'&&e.d==n),p=cnt(e=>e.k=='plus'&&e.d==n),m=cnt(e=>e.k=='minus'&&e.d==n),gl=cnt(e=>e.k=='goal'&&e.d==n),ast=cnt(e=>e.k=='goal'&&(e.a1==n||e.a2==n));return['#'+n+nm(n),cnt(e=>e.k=='pshot'&&e.d==n),gl,ast,gl+ast,b,p,m,(p-m>0?'+':'')+(p-m)]}),
     gk:gs.map(n=>{const sv=cnt(e=>e.k=='save'&&e.d==n),ga=cnt(e=>e.k=='ga'&&e.d==n);return['#'+n+nm(n),sv,ga,sv+ga?(Math.round(1000*sv/(sv+ga))/10).toString().replace('.',',')+' %':'–']}),
     lu:[0,1,2].map(r=>['Reihe '+(r+1),...POS.map((p,k)=>S.slots[r*5+k]?'#'+S.slots[r*5+k]+nm(S.slots[r*5+k]):'–')])}}
 const NAME={shot:'Schuss aufs Tor',goal:'Tor',bw:'Bully gewonnen',bl:'Bully verloren',bd:'Bully unentschieden',pshot:'Schuss Spieler',blk:'Block',plus:'Plus',minus:'Minus',save:'Save/Block Torwart',ga:'Gegentor'};
-const evD=e=>['bw','bl','bd'].includes(e.k)?'Center '+e.d+(e.n?' (#'+e.n+')':''):(e.d?'#'+e.d:'');
+const evD=e=>e.k=='goal'&&e.d?'#'+e.d+([e.a1,e.a2].some(Boolean)?' · A '+[e.a1,e.a2].filter(Boolean).map(x=>'#'+x).join(', '):'')+(e.m?" · "+e.m+"'":''):['bw','bl','bd'].includes(e.k)?'Center '+e.d+(e.n?' (#'+e.n+')':''):(e.d?'#'+e.d:'');
 const ttl=()=>($('#title').value.trim()||'Eishockey Statistik');
 const fname=()=>ttl().replace(/[^\wäöüÄÖÜß\- ]+/g,'').trim().replace(/\s+/g,'_')||'Statistik';
 const today=()=>new Date().toLocaleDateString('de-DE');
@@ -216,10 +260,10 @@ $('#newg').onclick=()=>{if(!confirmNew){confirmNew=true;$('#newg').textContent='
 $('#csv').onclick=()=>{const s=stats(),q=v=>'"'+String(v).replace(/"/g,'""')+'"',R=[];
   R.push([ttl()],['Datum',today()],[],['Bully','Gewonnen','Verloren','Unentschieden']);
   s.by.forEach(b=>R.push(['Center '+b[0],b[1],b[2],b[3]]));
-  R.push([],['Spieler','Schüsse','Blocks','Plus','Minus','Plus/Minus']);s.pl.forEach(p=>R.push(p));
+  R.push([],['Tore ('+s.goals.length+')'],['Drittel','Minute','Torschütze','Assist 1','Assist 2']);s.goals.forEach(g=>R.push(g));R.push([],['Spieler','Schüsse','Tore','Assists','Punkte','Blocks','Plus','Minus','Plus/Minus']);s.pl.forEach(p=>R.push(p));
   R.push([],['Torwart','Saves','Gegentore','Fangquote']);s.gk.forEach(p=>R.push(p));
   R.push([],['Aufstellung (Stand beim Speichern)'],['',...POS]);s.lu.forEach(l=>R.push(l));R.push(['Torwart',twS()]);
-  R.push([],['Ereignisse'],['Uhrzeit','Drittel','Ereignis','Center/Spieler']);S.ev.forEach(e=>R.push([e.t,e.p,NAME[e.k],evD(e)]));
+  R.push([],['Ereignisse'],['Uhrzeit','Drittel','Ereignis','Center/Spieler']);S.ev.forEach(e=>R.push([e.t,PN(e.p),NAME[e.k],evD(e)]));
   out(fname()+'.csv',new Blob(['\ufeff'+R.map(r=>r.map(q).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8'}))};
 $('#pdf').onclick=()=>{if(!window.jspdf){$('#msg').textContent='PDF-Bibliothek nicht geladen (Internet?).';return}
   const s=stats(),d=new window.jspdf.jsPDF({unit:'mm',format:'a4'});let y=0;
@@ -228,13 +272,13 @@ $('#pdf').onclick=()=>{if(!window.jspdf){$('#msg').textContent='PDF-Bibliothek n
   d.setTextColor(255);d.setFont('helvetica','bold');d.setFontSize(17);d.text(ttl(),S.logo?30:10,13);d.setFontSize(10);d.setFont('helvetica','normal');d.text('1. EV Weiden · '+today(),S.logo?30:10,19);
   d.setTextColor(30);y=34;
   const H=t=>{if(y>270){d.addPage();y=16}d.setFont('helvetica','bold');d.setFontSize(12);d.setTextColor(11,61,130);d.text(t,10,y);y+=6;d.setTextColor(30);d.setFontSize(10)};
-  const row=(c,b,w)=>{w=w||38;if(y>282){d.addPage();y=16}d.setFont('helvetica',b?'bold':'normal');c.forEach((t,i)=>d.text(String(t),10+i*w,y));y+=5.5;if(b){d.setDrawColor(180);d.line(10,y-3.8,190,y-3.8)}};
+  const row=(c,b,w)=>{w=w||38;if(y>282){d.addPage();y=16}d.setFont('helvetica',b?'bold':'normal');let x=10;c.forEach((t,i)=>{d.text(String(t),x,y);x+=Array.isArray(w)?w[i]:w});y+=5.5;if(b){d.setDrawColor(180);d.line(10,y-3.8,190,y-3.8)}};
   
   H('Bullys');row(['Center','Gewonnen','Verloren','Unentschieden'],1);s.by.forEach(b=>row(['Center '+b[0],b[1],b[2],b[3]]));y+=3;
-  H('Spieler');row(['Nr.','Schüsse','Blocks','Plus','Minus','Plus/Minus'],1,30);s.pl.forEach(p=>row(p,0,30));y+=3;
+  const TW=[18,16,48,46,46],PW=[42,17,15,17,17,16,16,16,16];H('Tore ('+s.goals.length+')');row(['Drittel','Minute','Torschütze','Assist 1','Assist 2'],1,TW);s.goals.forEach(g=>row(g,0,TW));y+=3;H('Spieler');row(['Nr.','Schüsse','Tore','Assists','Punkte','Blocks','Plus','Minus','+/-'],1,PW);s.pl.forEach(p=>row(p,0,PW));y+=3;
   H('Torwart');row(['Nr.','Saves','Gegentore','Fangquote'],1);s.gk.forEach(p=>row(p));y+=3;
   H('Aufstellung (Stand beim Speichern)');row(['',...POS],1,28);s.lu.forEach(l=>row(l,0,28));row(['Torwart',twS()],0,28);y+=3;
-  H('Ereignisse ('+S.ev.length+')');row(['Uhrzeit','Drittel','Ereignis','Center/Spieler'],1);S.ev.forEach(e=>row([e.t,e.p+'.',NAME[e.k],evD(e)]));
+  H('Ereignisse ('+S.ev.length+')');row(['Uhrzeit','Drittel','Ereignis','Center/Spieler'],1);S.ev.forEach(e=>row([e.t,e.p==4?'OT':e.p+'.',NAME[e.k],evD(e)]));
   out(fname()+'.pdf',d.output('blob'))};
 render();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
