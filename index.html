@@ -113,6 +113,10 @@ footer #save{flex:1.6;background:var(--blue);color:#fff;box-shadow:0 3px 0 #0b3d
 .box .row button{flex:1;border:0;border-radius:10px;padding:12px;font-weight:800;font-size:15px;background:var(--blue);color:#fff}
 .box .row button.g{background:var(--grey);color:var(--ink)}
 .box .row button.ev{background:var(--navy)}
+.box .row button.danger{background:var(--red);color:#fff}
+#delbtn{background:var(--red);color:#fff;box-shadow:0 3px 0 #8f1d1d}
+#dm{display:none;position:fixed;inset:0;background:#000a;z-index:10;align-items:center;justify-content:center;padding:12px}#dm.on{display:flex}
+#dm p{margin:0 0 6px;font-size:15px;line-height:1.4}#dm ul{margin:6px 0 4px 18px;padding:0;font-size:14px;line-height:1.5}
 #msg{font-size:12px;color:var(--mut);margin-top:8px;min-height:16px}
 #tm .r{display:flex;gap:8px;margin:10px 0}
 #tm .r button{border:0;border-radius:10px;padding:12px 14px;font-weight:800;font-size:15px;background:var(--blue);color:#fff}
@@ -184,11 +188,12 @@ footer #save{flex:1.6;background:var(--blue);color:#fff;box-shadow:0 3px 0 #0b3d
   <div id="grid"></div>
   <div id="gk"></div>
 </div>
-<footer><button id="tbtn">Team</button><button id="undo">↶ Zurück</button><button id="save">Speichern / Export</button></footer>
+<footer><button id="tbtn">Team</button><button id="delbtn">Alles löschen</button><button id="undo">↶ Zurück</button><button id="save">Speichern / Export</button></footer>
 <div id="toast"></div>
 <div id="pick"><div class="sheet"><h2><span id="pt"></span><button id="pdone">Fertig</button></h2><div id="pg"></div></div></div>
 <div id="tm"><div class="box"><h2>Teamliste</h2><p id="tcount"></p><div class="r"><input id="tn" inputmode="decimal" placeholder="Nummern, z. B. 7, 12, 19"><button id="tadd">+</button></div><div id="tc"></div><p style="margin-bottom:10px">Nummer antippen = entfernen</p><button id="tdone">Fertig</button></div></div>
 <div id="gm"><div class="sheet"><h2><span>Tor erfassen</span><button id="gx">Abbrechen</button></h2><div id="gt"></div><div id="gl"></div><button id="gsave">Tor speichern</button></div></div>
+<div id="dm"><div class="box"><h2>Wirklich alles löschen?</h2><p>Das löscht unwiderruflich:</p><ul><li>die komplette Aufstellung</li><li>alle getaggten Ereignisse und Tore</li><li>Überschrift, U20-Namen und Bemerkungen</li></ul><p style="margin-top:8px;font-size:13px;color:var(--mut)">Teamliste und Logo bleiben erhalten.</p><div class="row"><button class="g" id="dno">Abbrechen</button><button class="danger" id="dyes">Ja, alles löschen</button></div></div></div>
 <div id="modal"><div class="box">
   <h2>Game Report speichern</h2>
   <label for="title">Überschrift (steht im Report neben „Game Report“)</label>
@@ -243,7 +248,7 @@ function mk(i){const no=S.slots[i],g=i==15,b=document.createElement('div');
   else gest(b,{tap:()=>add('pshot',no,'#'+no+': Schuss'),right:()=>add('blk',no,'#'+no+': Block'),up:()=>add('plus',no,'#'+no+': Plus'),down:()=>add('minus',no,'#'+no+': Minus')});
   return b}
 function render(){
-  $('#edit').classList.toggle('on',S.edit);$('#edit').textContent=S.edit?'EDIT':'GAME';$('#tbtn').style.display=S.edit?'':'none';
+  $('#edit').classList.toggle('on',S.edit);$('#edit').textContent=S.edit?'EDIT':'GAME';$('#tbtn').style.display=S.edit?'':'none';$('#delbtn').style.display=S.edit?'':'none';
   $('#sub').textContent=S.edit?'Edit-Modus · Positionen antippen':'Game-Modus · Live-Tagging';
   $('#per').textContent=S.per==4?'OT':S.per+'. Drittel';
   $('#logo').innerHTML=S.logo?'<img src="'+S.logo+'" alt="">':'EVW';
@@ -330,6 +335,12 @@ const fname=()=>(titleVal()?'Game_Report_'+titleVal():'Game_Report').replace(/[^
 const today=()=>new Date().toLocaleDateString('de-DE');
 async function out(name,blob){const m=$('#msg');try{const f=new File([blob],name,{type:blob.type});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});m.textContent=name+' geteilt/gespeichert.';return}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);m.textContent=name+' heruntergeladen.'}catch(e){m.textContent=(e&&e.name=='AbortError')?'Abgebrochen.':'Speichern nicht möglich.'}}
 
+// ---------- Alles löschen (nur im Edit-Modus, mit Nachfrage) ----------
+$('#delbtn').onclick=()=>$('#dm').classList.add('on');
+$('#dno').onclick=()=>$('#dm').classList.remove('on');
+$('#dyes').onclick=()=>{S.ev=[];S.per=1;S.slots=Array(16).fill(null);S.title='';S.u={71:'',72:'',73:''};S.note='';
+  $('#title').value='';U20.forEach(n=>$('#u'+n).value='');$('#note').value='';
+  persist();$('#dm').classList.remove('on');render();toast('Alles gelöscht')};
 // ---------- Speichern-Dialog ----------
 $('#save').onclick=()=>{$('#title').value=S.title||'';U20.forEach(n=>$('#u'+n).value=S.u[n]||'');$('#note').value=S.note||'';$('#msg').textContent='';confirmNew=false;$('#newg').textContent='Neues Spiel';$('#modal').classList.add('on')};
 $('#title').addEventListener('input',()=>{S.title=$('#title').value;persist()});
