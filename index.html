@@ -172,6 +172,22 @@ footer #save{flex:1.6;background:var(--blue);color:#fff;box-shadow:0 3px 0 #0b3d
   .btn.tor{grid-column:4;grid-row:5;flex:none}
   .gslot .no{font-size:30px}
 }
+
+.box .row button.g.on{background:var(--navy);color:#fff}
+#mlab{margin-top:8px;font-size:15px;font-weight:900;color:var(--navy);text-align:center}
+@media (prefers-color-scheme:dark){#mlab{color:#8fbcff}}
+.lg{grid-column:1/-1;display:grid;gap:6px}
+.lr{border:2px solid var(--c);border-radius:10px;padding:4px}
+.lr.r1{--c:#0b3d82}.lr.r2{--c:#1e6fd9}.lr.r3{--c:#5b7391}.lr.r0{--c:#1e6fd9}
+.lh{font-size:11px;font-weight:900;color:#fff;background:var(--c);border-radius:6px;padding:2px 8px;display:inline-block;margin-bottom:4px}
+.lfw{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.ldf{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin:5px 16.6% 0}
+.lr .pn{padding:5px 0;font-size:19px;line-height:1.1;min-width:0}
+.pn small.pl{font-size:9px;font-weight:800;opacity:.65;letter-spacing:.5px}
+.lr.r0 .pn{grid-column:2}
+.pn.more{grid-column:1/-1;font-size:14px;padding:9px;border-style:dashed}
+.lg2{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+@media (orientation:landscape) and (max-height:620px){.lg{grid-template-columns:repeat(3,1fr)}#gm .sheet{height:96vh;padding-top:8px;gap:5px}#gm h2 button{padding:5px 12px}.gtab{padding:2px}.gtab b{font-size:14px}#gl .pn.clr{padding:4px;font-size:13px}#gsave{padding:8px}.lr .pn{font-size:16px;padding:3px 0}.lr .pn small{font-size:9px}.lr.r0{grid-column:1/-1}}
 </style>
 </head>
 <body>
@@ -193,11 +209,15 @@ footer #save{flex:1.6;background:var(--blue);color:#fff;box-shadow:0 3px 0 #0b3d
 <div id="pick"><div class="sheet"><h2><span id="pt"></span><button id="pdone">Fertig</button></h2><div id="pg"></div></div></div>
 <div id="tm"><div class="box"><h2>Teamliste</h2><p id="tcount"></p><div class="r"><input id="tn" inputmode="decimal" placeholder="Nummern, z. B. 7, 12, 19"><button id="tadd">+</button></div><div id="tc"></div><p style="margin-bottom:10px">Nummer antippen = entfernen</p><button id="tdone">Fertig</button></div></div>
 <div id="gm"><div class="sheet"><h2><span>Tor erfassen</span><button id="gx">Abbrechen</button></h2><div id="gt"></div><div id="gl"></div><button id="gsave">Tor speichern</button></div></div>
-<div id="dm"><div class="box"><h2>Wirklich alles löschen?</h2><p>Das löscht unwiderruflich:</p><ul><li>die komplette Aufstellung</li><li>alle getaggten Ereignisse und Tore</li><li>Überschrift, U20-Namen und Bemerkungen</li></ul><p style="margin-top:8px;font-size:13px;color:var(--mut)">Teamliste und Logo bleiben erhalten.</p><div class="row"><button class="g" id="dno">Abbrechen</button><button class="danger" id="dyes">Ja, alles löschen</button></div></div></div>
+<div id="dm"><div class="box"><h2>Wirklich alles löschen?</h2><p>Das löscht unwiderruflich:</p><ul><li>die komplette Aufstellung</li><li>alle getaggten Ereignisse und Tore</li><li>Überschrift, Gegner, U20-Namen und Bemerkungen</li></ul><p style="margin-top:8px;font-size:13px;color:var(--mut)">Teamliste und Logo bleiben erhalten.</p><div class="row"><button class="g" id="dno">Abbrechen</button><button class="danger" id="dyes">Ja, alles löschen</button></div></div></div>
 <div id="modal"><div class="box">
   <h2>Game Report speichern</h2>
   <label for="title">Überschrift (steht im Report neben „Game Report“)</label>
-  <input id="title" placeholder="z. B. U17 gegen Selb, 29.10." maxlength="80">
+  <input id="title" placeholder="z. B. Punktspiel U17" maxlength="80">
+  <label for="opp">Gegner</label>
+  <input id="opp" placeholder="z. B. Selb" maxlength="30">
+  <div class="row ha"><button class="g" id="bhome">Heim</button><button class="g" id="baway">Auswärts</button></div>
+  <div id="mlab"></div>
   <label>U20-Spieler (Namen für heute)</label>
   <div class="u20">
     <div><i>#71</i><input id="u71" placeholder="Name" maxlength="24"></div>
@@ -205,7 +225,7 @@ footer #save{flex:1.6;background:var(--blue);color:#fff;box-shadow:0 3px 0 #0b3d
     <div><i>#73</i><input id="u73" placeholder="Name" maxlength="24"></div>
   </div>
   <label for="note">Sonstige Bemerkungen</label>
-  <textarea id="note" rows="3" maxlength="300" placeholder="z. B. Gegner, Besonderheiten …"></textarea>
+  <textarea id="note" rows="3" maxlength="300" placeholder="z. B. Besonderheiten …"></textarea>
   <div class="row"><button id="csv">CSV</button><button id="pdf">PDF</button></div>
   <div class="row"><button class="ev" id="evpdf">Ereignisliste als PDF</button></div>
   <div class="row"><button class="g" id="newg">Neues Spiel</button><button class="g" id="close">Schließen</button></div>
@@ -215,7 +235,7 @@ footer #save{flex:1.6;background:var(--blue);color:#fff;box-shadow:0 3px 0 #0b3d
 <script>
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let S={per:1,slots:Array(16).fill(null),ev:[],edit:true,logo:'',title:'',team:[],u:{71:'',72:'',73:''},note:''},confirmNew=false,pk=null;
+let S={per:1,slots:Array(16).fill(null),ev:[],edit:true,logo:'',title:'',opp:'',home:true,team:[],u:{71:'',72:'',73:''},note:''},confirmNew=false,pk=null;
 try{const j=localStorage.getItem('evw');if(j)S=Object.assign(S,JSON.parse(j))}catch(e){}
 if(!Array.isArray(S.slots)||S.slots.length!=16)S.slots=Array(16).fill(null);
 if(!S.u||typeof S.u!='object')S.u={71:'',72:'',73:''};
@@ -289,30 +309,49 @@ const KEYS=['s','a1','a2','m'],TL=['Torschütze','Assist 1','Assist 2','Minute']
 const PN=p=>p==4?'OT':p;
 let G={tab:0,s:null,a1:null,a2:null,m:null};
 function allNums(){const sk=[...new Set([...Object.keys(SK),...S.team.filter(x=>!GK[x])])].sort((a,b)=>a-b);return [...sk,...Object.keys(GK)]}
+function lineupHtml(k,others){
+  const cur=G[k],btn=(n,lab)=>{n=n?String(n):'';if(!n)return '<button class="pn" disabled><small class="pl">'+lab+'</small>–</button>';
+    return '<button class="pn'+(cur==n?' cur':'')+'"'+(others.includes(n)?' disabled':'')+' data-v="'+n+'"><small class="pl">'+lab+'</small>'+n+(NM(n)?'<small>'+esc(NM(n))+'</small>':'')+'</button>'};
+  let h='<div class="lg">';
+  for(let r=0;r<3;r++){const b=r*5;
+    h+='<div class="lr r'+(r+1)+'"><div class="lh">REIHE '+(r+1)+'</div><div class="lfw">'+[2,1,0].map(j=>btn(S.slots[b+j],POS[j])).join('')+'</div><div class="ldf">'+[3,4].map(j=>btn(S.slots[b+j],POS[j])).join('')+'</div></div>'}
+  h+='<div class="lr r0"><div class="lh">TORWART</div><div class="lfw">'+btn(S.slots[15],'TW')+'</div></div></div>';
+  const used=new Set(S.slots.filter(Boolean).map(String)),rest=allNums().filter(n=>!used.has(String(n)));
+  if(rest.length){const open=G.more||rest.some(n=>String(n)==String(cur));
+    h+='<button class="pn more" data-more="1">Weitere Spieler ('+rest.length+') '+(open?'▴':'▾')+'</button>';
+    if(open)h+='<div class="lg2">'+rest.map(n=>{n=String(n);return '<button class="pn'+(cur==n?' cur':'')+'"'+(others.includes(n)?' disabled':'')+' data-v="'+n+'">'+n+(NM(n)?'<small>'+esc(NM(n))+'</small>':'')+'</button>'}).join('')+'</div>'}
+  return h}
 function renderGoal(){
   $('#gt').innerHTML=KEYS.map((k,i)=>{const v=G[k];return '<button class="gtab'+(G.tab==i?' on':'')+'" data-t="'+i+'"><span>'+TL[i]+'</span><b>'+(v?(k=='m'?v+"'":'#'+v):'–')+'</b></button>'}).join('');
   let h='';
   if(G.tab<3){const k=KEYS[G.tab],others=KEYS.slice(0,3).filter(x=>x!=k).map(x=>G[x]).filter(Boolean);
     h+='<button class="pn clr" data-v="">'+(G.tab==0?'Auswahl löschen':'kein Assist')+'</button>';
-    allNums().forEach(n=>{h+='<button class="pn'+(G[k]==n?' cur':'')+'"'+(others.includes(n)?' disabled':'')+' data-v="'+n+'">'+n+(NM(n)?'<small>'+esc(NM(n))+'</small>':'')+'</button>'})}
+    h+=lineupHtml(k,others)}
   else{const r=PR[S.per]||PR[1];for(let m=r[0];m<=r[1];m++)h+='<button class="pn'+(G.m==m?' cur':'')+'" data-v="'+m+'">'+m+"'</button>"}
   $('#gl').innerHTML=h;
   $('#gsave').disabled=!G.s;$('#gsave').textContent=G.s?'Tor speichern':'Zuerst Torschütze wählen';
 }
 $('#gt').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;G.tab=+b.dataset.t;renderGoal()};
-$('#gl').onclick=e=>{const b=e.target.closest('[data-v]');if(!b||b.disabled)return;const v=b.dataset.v;
+$('#gl').onclick=e=>{if(e.target.closest('[data-more]')){G.more=!G.more;renderGoal();return}const b=e.target.closest('[data-v]');if(!b||b.disabled)return;const v=b.dataset.v;
   if(G.tab<3){const k=KEYS[G.tab];
     if(v===''){G[k]=null;if(G.tab>0){if(G.tab==1)G.a2=null;G.tab=3}}
     else{G[k]=(G[k]==v)?null:v;if(G[k])G.tab++}}
   else G.m=(G.m==v)?null:v;
   renderGoal()};
-function openGoal(){G={tab:0,s:null,a1:null,a2:null,m:null};renderGoal();$('#gm').classList.add('on')}
+function openGoal(){G={tab:0,s:null,a1:null,a2:null,m:null,more:false};renderGoal();$('#gm').classList.add('on')}
 $('#gx').onclick=()=>$('#gm').classList.remove('on');
 $('#gsave').onclick=()=>{if(!G.s)return;S.ev.push({t:new Date().toLocaleTimeString('de-DE'),p:S.per,k:'goal',d:G.s,a1:G.a1||'',a2:G.a2||'',m:G.m||'',n:''});persist();toast('TOR! #'+G.s);$('#gm').classList.remove('on');render()};
 
 // ---------- Statistik ----------
 const uniq=a=>[...new Set(a.filter(Boolean).map(String))].sort((a,b)=>a-b);
 const fn=n=>'#'+n+nm(n);
+const oppN=()=>(S.opp||'').trim()||'Gegner';
+const sides=()=>S.home===false?[oppN(),'EV Weiden']:['EV Weiden',oppN()];
+function score(){
+  const per=[1,2,3,4].map(p=>({p,f:cnt(e=>e.p==p&&e.k=='goal'&&e.d),a:cnt(e=>e.p==p&&e.k=='ga')}));
+  const o=x=>S.home===false?[x.a,x.f]:[x.f,x.a];
+  const ot=per[3].f+per[3].a>0;
+  return{names:sides(),rows:per.filter(x=>x.p<4||ot).map(x=>({p:x.p,v:o(x)})),tot:o({f:per.reduce((a,x)=>a+x.f,0),a:per.reduce((a,x)=>a+x.a,0)})}}
 const pct=(a,b)=>b?Math.round(100*a/b)+'%':'-';
 function stats(){
   const E=S.ev;
@@ -326,6 +365,7 @@ function stats(){
     gk:gnums.map(n=>{const sv=cnt(e=>e.k=='save'&&e.d==n),ga=cnt(e=>e.k=='ga'&&e.d==n);return{n,name:NM(n),sv,ga,q:pct(sv,sv+ga)}}),
     lu:S.slots.slice(),
     u20:U20.filter(n=>(S.u[n]||'').trim()).map(n=>[n,S.u[n].trim()]),
+    sc:score(),
     note:(S.note||'').trim()}}
 const NAME={shot:'Schuss aufs Tor',goal:'Tor',bw:'Bully gewonnen',bl:'Bully verloren',bd:'Bully unentschieden',pshot:'Schuss Spieler',blk:'Block',plus:'Plus',minus:'Minus',save:'Save/Block Torwart',ga:'Gegentor'};
 const evD=e=>e.k=='goal'&&e.d?fn(e.d)+([e.a1,e.a2].some(Boolean)?' · A '+[e.a1,e.a2].filter(Boolean).map(fn).join(', '):'')+(e.m?" · "+e.m+"'":''):['bw','bl','bd'].includes(e.k)?'Center '+e.d+(e.n?' (#'+e.n+')':''):(e.d?fn(e.d):'');
@@ -338,20 +378,25 @@ async function out(name,blob){const m=$('#msg');try{const f=new File([blob],name
 // ---------- Alles löschen (nur im Edit-Modus, mit Nachfrage) ----------
 $('#delbtn').onclick=()=>$('#dm').classList.add('on');
 $('#dno').onclick=()=>$('#dm').classList.remove('on');
-$('#dyes').onclick=()=>{S.ev=[];S.per=1;S.slots=Array(16).fill(null);S.title='';S.u={71:'',72:'',73:''};S.note='';
-  $('#title').value='';U20.forEach(n=>$('#u'+n).value='');$('#note').value='';
+$('#dyes').onclick=()=>{S.ev=[];S.per=1;S.slots=Array(16).fill(null);S.title='';S.opp='';S.home=true;S.u={71:'',72:'',73:''};S.note='';
+  $('#title').value='';$('#opp').value='';U20.forEach(n=>$('#u'+n).value='');$('#note').value='';
   persist();$('#dm').classList.remove('on');render();toast('Alles gelöscht')};
 // ---------- Speichern-Dialog ----------
-$('#save').onclick=()=>{$('#title').value=S.title||'';U20.forEach(n=>$('#u'+n).value=S.u[n]||'');$('#note').value=S.note||'';$('#msg').textContent='';confirmNew=false;$('#newg').textContent='Neues Spiel';$('#modal').classList.add('on')};
+$('#save').onclick=()=>{$('#title').value=S.title||'';$('#opp').value=S.opp||'';haUi();U20.forEach(n=>$('#u'+n).value=S.u[n]||'');$('#note').value=S.note||'';$('#msg').textContent='';confirmNew=false;$('#newg').textContent='Neues Spiel';$('#modal').classList.add('on')};
 $('#title').addEventListener('input',()=>{S.title=$('#title').value;persist()});
+function haUi(){$('#bhome').classList.toggle('on',S.home!==false);$('#baway').classList.toggle('on',S.home===false);$('#mlab').textContent=sides().join(' : ')}
+$('#opp').addEventListener('input',()=>{S.opp=$('#opp').value;persist();haUi()});
+$('#bhome').onclick=()=>{S.home=true;persist();haUi()};
+$('#baway').onclick=()=>{S.home=false;persist();haUi()};
 U20.forEach(n=>$('#u'+n).addEventListener('input',()=>{S.u[n]=$('#u'+n).value;persist();render()}));
 $('#note').addEventListener('input',()=>{S.note=$('#note').value;persist()});
 $('#close').onclick=()=>{persist();$('#modal').classList.remove('on')};
-$('#newg').onclick=()=>{if(!confirmNew){confirmNew=true;$('#newg').textContent='Sicher? Alles löschen';return}S.ev=[];S.per=1;S.title='';S.u={71:'',72:'',73:''};S.note='';$('#title').value='';U20.forEach(n=>$('#u'+n).value='');$('#note').value='';persist();render();$('#modal').classList.remove('on')};
+$('#newg').onclick=()=>{if(!confirmNew){confirmNew=true;$('#newg').textContent='Sicher? Alles löschen';return}S.ev=[];S.per=1;S.title='';S.opp='';S.home=true;S.u={71:'',72:'',73:''};S.note='';$('#title').value='';$('#opp').value='';U20.forEach(n=>$('#u'+n).value='');$('#note').value='';persist();render();$('#modal').classList.remove('on')};
 
 // ---------- CSV ----------
 $('#csv').onclick=()=>{const s=stats(),q=v=>'"'+String(v).replace(/"/g,'""')+'"',R=[],sg=x=>(x>0?'+':'')+x;
-  R.push(['Game Report',titleVal()],['Datum',today()],['Verein','1. EV Weiden']);
+  R.push(['Game Report',titleVal()],['Datum',today()],['Verein','1. EV Weiden'],['Spiel',s.sc.names.join(' : ')],['Heim/Auswärts',S.home===false?'Auswärts':'Heim']);
+  R.push([],['Spielstand'],['Drittel',s.sc.names.join(' : ')]);s.sc.rows.forEach(r=>R.push([PN(r.p),r.v.join(':')]));R.push(['Endstand',s.sc.tot.join(':')]);
   if(s.u20.length||s.note){R.push([],['Bemerkungen']);s.u20.forEach(u=>R.push(['#'+u[0],u[1]]));if(s.note)R.push(['Notiz',s.note.replace(/\s*\n\s*/g,' / ')])}
   R.push([],['Spieler'],['Nr.','Name','Schüsse','Tore','Assists','Punkte','Blocks','Plus','Minus','Plus/Minus']);s.pl.forEach(p=>R.push(['#'+p.n,p.name,p.S,p.G,p.A,p.P,p.B,p.pl,p.mi,sg(p.pm)]));
   R.push([],['Tore ('+s.goals.length+')'],['Drittel','Minute','Torschütze','Assist 1','Assist 2']);s.goals.forEach(g=>R.push([PN(g.p),g.m||'',g.s,g.a[0]||'',g.a[1]||'']));
@@ -382,7 +427,7 @@ function makePdf(){
   const gx=M+22,gw=wd('GAME REPORT',25,'bold');font(25,'bold');T(WHITE);d.text('GAME REPORT',gx,15);
   const tx=gx+gw+10,tw=PW-M-52-tx;
   if(titleVal()){D([140,175,230]);d.setLineWidth(0.5);d.line(tx-5,6,tx-5,17.5);const tt=fit(titleVal(),tw,17,'normal',9);T(WHITE);d.text(tt,tx,14.2)}
-  font(11,'bold');T(WHITE);d.text('1. EV WEIDEN',PW-M,10,{align:'right'});font(9,'normal');T([200,220,255]);d.text(today(),PW-M,16,{align:'right'});
+  T(WHITE);d.text(fit(s.sc.names.join(' : ').toUpperCase(),50,11,'bold',7),PW-M,10,{align:'right'});font(9,'normal');T([200,220,255]);d.text(today(),PW-M,16,{align:'right'});
 
   // Bausteine
   const sec=(x,y,w,h,title,right)=>{F(WHITE);D(BLUE);d.setLineWidth(0.4);d.roundedRect(x,y,w,h,1.8,1.8,'FD');F(NAVY);d.roundedRect(x,y,w,6.4,1.8,1.8,'F');d.rect(x,y+3,w,3.4,'F');font(8.6,'bold');T(WHITE);d.text(P(title),x+3,y+4.4);if(right){font(7,'normal');T([200,220,255]);d.text(P(right),x+w-3,y+4.3,{align:'right'})}};
@@ -401,7 +446,7 @@ function makePdf(){
     return y+hh+0.7+rows.length*rh};
   const empty=(x,y,w,h,t)=>{font(8,'normal');T(MUT);d.text(t,x+w/2,y+h/2,{align:'center'})};
 
-  const y0=28,H=PH-7-y0,AW=140,BW=62,CW=PW-2*M-AW-BW-10,ax=M,bx=M+AW+5,cx0=bx+BW+5;
+  const sbH=31,y0=28,H=PH-7-y0,AW=140,BW=62,CW=PW-2*M-AW-BW-10,ax=M,bx=M+AW+5,cx0=bx+BW+5;
 
   // Spieler
   {sec(ax,y0,AW,H,'SPIELER');
@@ -414,11 +459,21 @@ function makePdf(){
      const tr=['Summe',tot('S'),tot('G'),tot('A'),tot('P'),tot('B'),tot('pl'),tot('mi'),''];tr.total=true;rows.push(tr);
      table(ax,y0+6.4+1.5,cols,rows,{rh,fs})}}
 
+  // Spielstand
+  {sec(bx,y0,BW,sbH,'SPIELSTAND');
+   const sc=s.sc,hw=BW/2-6;
+   font(7,'bold');T(MUT);d.text(fit(sc.names[0],hw,7,'bold',5),bx+3,y0+11.8);d.text(fit(sc.names[1],hw,7,'bold',5),bx+BW-3,y0+11.8,{align:'right'});
+   font(21,'bold');T(NAVY);d.text(sc.tot[0]+' : '+sc.tot[1],bx+BW/2,y0+19.6,{align:'center'});
+   const k=sc.rows.length,gap=1.5,cw=(BW-4-(k-1)*gap)/k;
+   sc.rows.forEach((r,i)=>{const x=bx+2+i*(cw+gap),yy=y0+21.6;F(LIGHT);d.roundedRect(x,yy,cw,7.6,1,1,'F');
+     font(5.6,'normal');T(MUT);d.text(r.p==4?'OT':r.p+'. Drittel',x+cw/2,yy+2.7,{align:'center'});
+     font(8.6,'bold');T(INK);d.text(r.v[0]+':'+r.v[1],x+cw/2,yy+6.5,{align:'center'})})}
+
   // Tore
-  const byH=38,toH=H-byH-5;
-  {sec(bx,y0,BW,toH,'TORE ('+s.goals.length+')');
-   const n=s.goals.length,top=y0+6.4+1.6,avail=toH-6.4-3.2;
-   if(!n)empty(bx,y0,BW,toH,'Keine Tore erfasst');
+  const byH=38,ty0=y0+sbH+5,toH=H-byH-5-sbH-5;
+  {sec(bx,ty0,BW,toH,'TORE ('+s.goals.length+')');
+   const n=s.goals.length,top=ty0+6.4+1.6,avail=toH-6.4-3.2;
+   if(!n)empty(bx,ty0,BW,toH,'Keine Tore erfasst');
    else{const two=avail/n>=8,gh=two?Math.min(11,avail/n):Math.min(6.6,avail/n);
      s.goals.forEach((g,i)=>{const ry=top+i*gh;if(i%2==0){F(LIGHT);d.rect(bx+1.5,ry,BW-3,gh,'F')}
        const dl=g.p==4?'OT':g.p+'. Drittel',ast=g.a.length?g.a.join(', '):'ohne Assist';
@@ -429,7 +484,7 @@ function makePdf(){
          const t=fit(g.s+'  (A: '+(g.a.length?g.a.join(', '):'-')+')  '+(g.p==4?'OT':g.p+'.Dr'),BW-16,7.4,'normal',5);T(INK);d.text(t,bx+13.5,base(ry,gh,7.4))}})}}
 
   // Bullys
-  {const y=y0+toH+5;sec(bx,y,BW,byH,'BULLYS');
+  {const y=ty0+toH+5;sec(bx,y,BW,byH,'BULLYS');
    const cols=[{h:'Center',w:19,a:'l'},{h:'Gew.',w:10,a:'c'},{h:'Verl.',w:10,a:'c'},{h:'Unent.',w:10,a:'c'},{h:'Quote',w:10,a:'c'}];
    const rows=s.by.map(b=>[{n:'Center '+b.c,t:b.num?'#'+b.num:''},b.w,b.l,b.u,{t:b.q,b:true}]);
    const W=s.by.reduce((a,b)=>a+b.w,0),L=s.by.reduce((a,b)=>a+b.l,0),U=s.by.reduce((a,b)=>a+b.u,0),tr=['Gesamt',W,L,U,pct(W,W+L+U)];tr.total=true;rows.push(tr);
